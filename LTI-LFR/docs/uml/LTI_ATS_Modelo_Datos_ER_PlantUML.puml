@@ -1,0 +1,506 @@
+@startuml
+title LTI ATS - Data Model as UML Class Diagram
+
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+
+class Organization {
+  +organizationId: UUID
+  name: String
+  legalName: String
+  taxId: String
+  status: String
+  createdAt: Timestamp
+  updatedAt: Timestamp
+}
+
+class User {
+  +userId: UUID
+  organizationId: UUID
+  firstName: String
+  lastName: String
+  email: String
+  jobTitle: String
+  status: String
+  lastLoginAt: Timestamp
+  createdAt: Timestamp
+  updatedAt: Timestamp
+}
+
+class Role {
+  +roleId: UUID
+  code: String
+  name: String
+  description: String
+  isSystemRole: Boolean
+}
+
+class UserRole {
+  +userRoleId: UUID
+  userId: UUID
+  roleId: UUID
+  assignedAt: Timestamp
+  assignedByUserId: UUID
+}
+
+class JobOpening {
+  +jobOpeningId: UUID
+  organizationId: UUID
+  createdByUserId: UUID
+  hiringManagerUserId: UUID
+  title: String
+  department: String
+  employmentType: String
+  workMode: String
+  location: String
+  seniorityLevel: String
+  description: Text
+  requirements: Text
+  salaryMin: Decimal
+  salaryMax: Decimal
+  currencyCode: String
+  status: String
+  openedAt: Timestamp
+  closedAt: Timestamp
+  createdAt: Timestamp
+  updatedAt: Timestamp
+}
+
+class JobOpeningApproval {
+  +jobOpeningApprovalId: UUID
+  jobOpeningId: UUID
+  requestedByUserId: UUID
+  approvedByUserId: UUID
+  approvalStatus: String
+  requestedAt: Timestamp
+  approvedAt: Timestamp
+  comments: Text
+}
+
+class PipelineTemplate {
+  +pipelineTemplateId: UUID
+  organizationId: UUID
+  name: String
+  description: Text
+  isDefault: Boolean
+  createdAt: Timestamp
+}
+
+class PipelineStageTemplate {
+  +pipelineStageTemplateId: UUID
+  pipelineTemplateId: UUID
+  name: String
+  stageOrder: Integer
+  stageType: String
+  isMandatory: Boolean
+}
+
+class JobOpeningStage {
+  +jobOpeningStageId: UUID
+  jobOpeningId: UUID
+  name: String
+  stageOrder: Integer
+  stageType: String
+  isActive: Boolean
+  isTerminalStage: Boolean
+}
+
+class RecruitmentChannel {
+  +recruitmentChannelId: UUID
+  organizationId: UUID
+  channelType: String
+  name: String
+  externalReference: String
+  status: String
+}
+
+class JobPosting {
+  +jobPostingId: UUID
+  jobOpeningId: UUID
+  recruitmentChannelId: UUID
+  title: String
+  postingText: Text
+  publicationStatus: String
+  publishedAt: Timestamp
+  unpublishedAt: Timestamp
+  externalUrl: String
+  sourceTrackingCode: String
+}
+
+class Candidate {
+  +candidateId: UUID
+  organizationId: UUID
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  location: String
+  linkedinUrl: String
+  portfolioUrl: String
+  summary: Text
+  currentTitle: String
+  yearsOfExperience: Integer
+  status: String
+  createdAt: Timestamp
+  updatedAt: Timestamp
+}
+
+class CandidateConsent {
+  +candidateConsentId: UUID
+  candidateId: UUID
+  consentType: String
+  acceptedFlag: Boolean
+  acceptedAt: Timestamp
+  expiresAt: Timestamp
+  policyVersion: String
+}
+
+class CandidateDocument {
+  +candidateDocumentId: UUID
+  candidateId: UUID
+  documentType: String
+  fileName: String
+  storagePath: String
+  mimeType: String
+  uploadedAt: Timestamp
+  uploadedByUserId: UUID
+}
+
+class Application {
+  +applicationId: UUID
+  candidateId: UUID
+  jobOpeningId: UUID
+  jobPostingId: UUID
+  currentJobOpeningStageId: UUID
+  applicationSourceType: String
+  applicationStatus: String
+  appliedAt: Timestamp
+  lastStageChangeAt: Timestamp
+  withdrawnAt: Timestamp
+}
+
+class ApplicationStageHistory {
+  +applicationStageHistoryId: UUID
+  applicationId: UUID
+  fromJobOpeningStageId: UUID
+  toJobOpeningStageId: UUID
+  changedByUserId: UUID
+  changeReason: String
+  changedAt: Timestamp
+}
+
+class ApplicationTag {
+  +applicationTagId: UUID
+  applicationId: UUID
+  tag: String
+  createdByUserId: UUID
+  createdAt: Timestamp
+}
+
+class ScorecardTemplate {
+  +scorecardTemplateId: UUID
+  organizationId: UUID
+  name: String
+  description: Text
+  createdAt: Timestamp
+}
+
+class ScorecardCriterion {
+  +scorecardCriterionId: UUID
+  scorecardTemplateId: UUID
+  name: String
+  description: Text
+  weight: Decimal
+  displayOrder: Integer
+}
+
+class ApplicationReview {
+  +applicationReviewId: UUID
+  applicationId: UUID
+  reviewerUserId: UUID
+  scorecardTemplateId: UUID
+  overallScore: Decimal
+  recommendation: String
+  comments: Text
+  reviewedAt: Timestamp
+}
+
+class ApplicationReviewDetail {
+  +applicationReviewDetailId: UUID
+  applicationReviewId: UUID
+  scorecardCriterionId: UUID
+  scoreValue: Decimal
+  comments: Text
+}
+
+class AssessmentProvider {
+  +assessmentProviderId: UUID
+  organizationId: UUID
+  name: String
+  providerType: String
+  status: String
+}
+
+class AssessmentTest {
+  +assessmentTestId: UUID
+  assessmentProviderId: UUID
+  name: String
+  testType: String
+  description: Text
+  estimatedDurationMinutes: Integer
+  status: String
+}
+
+class ApplicationAssessment {
+  +applicationAssessmentId: UUID
+  applicationId: UUID
+  assessmentTestId: UUID
+  assignedByUserId: UUID
+  invitedAt: Timestamp
+  startedAt: Timestamp
+  completedAt: Timestamp
+  assessmentStatus: String
+  externalReference: String
+}
+
+class ApplicationAssessmentResult {
+  +applicationAssessmentResultId: UUID
+  applicationAssessmentId: UUID
+  scoreValue: Decimal
+  scoreLabel: String
+  passedFlag: Boolean
+  resultSummary: Text
+  receivedAt: Timestamp
+}
+
+class Interview {
+  +interviewId: UUID
+  applicationId: UUID
+  jobOpeningStageId: UUID
+  interviewType: String
+  scheduledStartAt: Timestamp
+  scheduledEndAt: Timestamp
+  timeZone: String
+  locationOrLink: String
+  status: String
+  createdByUserId: UUID
+  createdAt: Timestamp
+}
+
+class InterviewParticipant {
+  +interviewParticipantId: UUID
+  interviewId: UUID
+  userId: UUID
+  participantRole: String
+  candidateFlag: Boolean
+  attendanceStatus: String
+}
+
+class InterviewFeedback {
+  +interviewFeedbackId: UUID
+  interviewId: UUID
+  reviewerUserId: UUID
+  scorecardTemplateId: UUID
+  overallScore: Decimal
+  recommendation: String
+  comments: Text
+  submittedAt: Timestamp
+}
+
+class InterviewFeedbackDetail {
+  +interviewFeedbackDetailId: UUID
+  interviewFeedbackId: UUID
+  scorecardCriterionId: UUID
+  scoreValue: Decimal
+  comments: Text
+}
+
+class HiringDecision {
+  +hiringDecisionId: UUID
+  applicationId: UUID
+  decisionStatus: String
+  decidedByUserId: UUID
+  decisionReason: Text
+  decidedAt: Timestamp
+}
+
+class Offer {
+  +offerId: UUID
+  applicationId: UUID
+  approvedByUserId: UUID
+  generatedByUserId: UUID
+  salaryAmount: Decimal
+  currencyCode: String
+  employmentType: String
+  startDate: Date
+  offerStatus: String
+  sentAt: Timestamp
+  respondedAt: Timestamp
+}
+
+class HiringEvent {
+  +hiringEventId: UUID
+  applicationId: UUID
+  eventType: String
+  externalSystem: String
+  externalReference: String
+  createdAt: Timestamp
+}
+
+class Comment {
+  +commentId: UUID
+  organizationId: UUID
+  entityType: String
+  entityId: UUID
+  authorUserId: UUID
+  commentText: Text
+  createdAt: Timestamp
+}
+
+class Mention {
+  +mentionId: UUID
+  commentId: UUID
+  mentionedUserId: UUID
+  createdAt: Timestamp
+}
+
+class Task {
+  +taskId: UUID
+  organizationId: UUID
+  entityType: String
+  entityId: UUID
+  assignedToUserId: UUID
+  createdByUserId: UUID
+  title: String
+  description: Text
+  dueAt: Timestamp
+  status: String
+  createdAt: Timestamp
+}
+
+class Notification {
+  +notificationId: UUID
+  organizationId: UUID
+  userId: UUID
+  notificationType: String
+  title: String
+  message: Text
+  readAt: Timestamp
+  createdAt: Timestamp
+}
+
+class AutomationRule {
+  +automationRuleId: UUID
+  organizationId: UUID
+  name: String
+  triggerEvent: String
+  conditionExpression: Text
+  actionType: String
+  actionPayload: Text
+  isActive: Boolean
+  createdByUserId: UUID
+  createdAt: Timestamp
+}
+
+class AutomationExecution {
+  +automationExecutionId: UUID
+  automationRuleId: UUID
+  entityType: String
+  entityId: UUID
+  executionStatus: String
+  executionLog: Text
+  executedAt: Timestamp
+}
+
+class AiInteraction {
+  +aiInteractionId: UUID
+  organizationId: UUID
+  userId: UUID
+  entityType: String
+  entityId: UUID
+  aiUseCase: String
+  inputPayload: Text
+  outputSummary: Text
+  createdAt: Timestamp
+}
+
+class AuditEvent {
+  +auditEventId: UUID
+  organizationId: UUID
+  entityType: String
+  entityId: UUID
+  eventType: String
+  performedByUserId: UUID
+  eventPayload: Text
+  createdAt: Timestamp
+}
+
+Organization "1" -- "0..*" User
+User "1" -- "0..*" UserRole
+Role "1" -- "0..*" UserRole
+
+Organization "1" -- "0..*" JobOpening
+User "1" -- "0..*" JobOpening : createdBy
+User "1" -- "0..*" JobOpening : hiringManager
+JobOpening "1" -- "0..*" JobOpeningApproval
+
+Organization "1" -- "0..*" PipelineTemplate
+PipelineTemplate "1" -- "0..*" PipelineStageTemplate
+JobOpening "1" -- "1..*" JobOpeningStage
+
+Organization "1" -- "0..*" RecruitmentChannel
+JobOpening "1" -- "0..*" JobPosting
+RecruitmentChannel "1" -- "0..*" JobPosting
+
+Organization "1" -- "0..*" Candidate
+Candidate "1" -- "0..*" CandidateConsent
+Candidate "1" -- "0..*" CandidateDocument
+
+Candidate "1" -- "0..*" Application
+JobOpening "1" -- "0..*" Application
+JobPosting "0..1" -- "0..*" Application
+JobOpeningStage "1" -- "0..*" Application : currentStage
+
+Application "1" -- "0..*" ApplicationStageHistory
+JobOpeningStage "0..1" -- "0..*" ApplicationStageHistory : fromStage
+JobOpeningStage "1" -- "0..*" ApplicationStageHistory : toStage
+Application "1" -- "0..*" ApplicationTag
+
+Organization "1" -- "0..*" ScorecardTemplate
+ScorecardTemplate "1" -- "1..*" ScorecardCriterion
+Application "1" -- "0..*" ApplicationReview
+ScorecardTemplate "0..1" -- "0..*" ApplicationReview
+ApplicationReview "1" -- "1..*" ApplicationReviewDetail
+ScorecardCriterion "1" -- "0..*" ApplicationReviewDetail
+
+Organization "0..1" -- "0..*" AssessmentProvider
+AssessmentProvider "1" -- "0..*" AssessmentTest
+Application "1" -- "0..*" ApplicationAssessment
+AssessmentTest "1" -- "0..*" ApplicationAssessment
+ApplicationAssessment "1" -- "0..1" ApplicationAssessmentResult
+
+Application "1" -- "0..*" Interview
+JobOpeningStage "1" -- "0..*" Interview
+Interview "1" -- "1..*" InterviewParticipant
+Interview "1" -- "0..*" InterviewFeedback
+ScorecardTemplate "0..1" -- "0..*" InterviewFeedback
+InterviewFeedback "1" -- "1..*" InterviewFeedbackDetail
+ScorecardCriterion "1" -- "0..*" InterviewFeedbackDetail
+
+Application "1" -- "0..1" HiringDecision
+Application "1" -- "0..*" Offer
+Application "1" -- "0..*" HiringEvent
+
+Organization "1" -- "0..*" Comment
+Comment "1" -- "0..*" Mention
+Organization "1" -- "0..*" Task
+Organization "1" -- "0..*" Notification
+
+Organization "1" -- "0..*" AutomationRule
+AutomationRule "1" -- "0..*" AutomationExecution
+
+Organization "1" -- "0..*" AiInteraction
+Organization "1" -- "0..*" AuditEvent
+@enduml
